@@ -139,7 +139,7 @@ const App = () => {
         >
           <option value="javascript">JavaScript</option>
           <option value="python">Python</option>
-          <option value="Java">Java</option>
+          <option value="java">Java</option>
           <option value="cpp">C++</option>
         </select>
         <button className="leave-button" onClick={leaveRoom}>
