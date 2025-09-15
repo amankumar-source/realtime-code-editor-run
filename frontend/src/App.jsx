@@ -14,6 +14,8 @@ const App = () => {
   const [copySuccess, setCopySuccess] = useState("");
   const [users, setUsers] = useState([]);
   const [typing, setTyping] = useState("");
+  const [output, setOutput] = useState("");
+  const [version, setVersion] = useState("*");
 
   useEffect(() => {
     socket.on("userJoined", (users) => {
@@ -30,11 +32,16 @@ const App = () => {
     socket.on("languageUpdate", (newLanguage) => {
       setLanguage(newLanguage);
     });
+
+    socket.on("codeResponse", (response) => {
+      setOutput(response.run.output);
+    });
     return () => {
       socket.off("userJoined");
       socket.off("codeUpdate");
       socket.off("userTyping");
       socket.off("languageUpdate");
+      socket.off("codeResponse");
     };
   }, []);
 
@@ -55,14 +62,14 @@ const App = () => {
       setJoined(true);
     }
   };
-  const leaveRoom=()=>{
-    socket.emit("leaveRoom")
-    setJoined(false)
-    setRoomId("")
-    setUserName("")
-    setCode("// Start code here")
-    setLanguage("javascrpt")
-  }
+  const leaveRoom = () => {
+    socket.emit("leaveRoom");
+    setJoined(false);
+    setRoomId("");
+    setUserName("");
+    setCode("// Start code here");
+    setLanguage("javascrpt");
+  };
 
   const copyRoomId = () => {
     navigator.clipboard.writeText(roomId);
@@ -79,6 +86,10 @@ const App = () => {
     const newLanguage = e.target.value;
     setLanguage(newLanguage);
     socket.emit("languageChange", { roomId, language: newLanguage });
+  };
+
+  const runCode = () => {
+    socket.emit("compileCode", { code, roomId, language, version });
   };
 
   if (!joined) {
@@ -131,48 +142,54 @@ const App = () => {
           <option value="Java">Java</option>
           <option value="cpp">C++</option>
         </select>
-        <button className="leave-button" onClick={leaveRoom}>Leave Room</button>
+        <button className="leave-button" onClick={leaveRoom}>
+          Leave Room
+        </button>
       </div>
       <div className="editor-wrapper">
-        
-<Editor
-  height={"100%"}
-  defaultLanguage={language}
-  language={language}
-  value={code}
-  onChange={handleCodeChange}
-  theme="vs-dark"
-  options={{
-    minimap: { enabled: false },
-    fontSize: window.innerWidth <= 768 ? 14 : 20,
-    wordWrap: 'on',
-    scrollBeyondLastLine: false,
-    automaticLayout: true,
-    scrollbar: {
-      useShadows: false,
-      verticalHasArrows: true,
-      horizontalHasArrows: true,
-      vertical: 'visible',
-      horizontal: 'visible',
-      verticalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
-      horizontalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
-    },
-   
-    mouseWheelZoom: true,
-    cursorSmoothCaretAnimation: true,
-    smoothScrolling: true,
-    
-    selectOnLineNumbers: true,
-    lineNumbersMinChars: window.innerWidth <= 768 ? 3 : 5,
-  }}
-/>
+        <Editor
+          height={"60%"}
+          defaultLanguage={language}
+          language={language}
+          value={code}
+          onChange={handleCodeChange}
+          theme="vs-dark"
+          options={{
+            minimap: { enabled: false },
+            fontSize: window.innerWidth <= 768 ? 14 : 20,
+            wordWrap: "on",
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            scrollbar: {
+              useShadows: false,
+              verticalHasArrows: true,
+              horizontalHasArrows: true,
+              vertical: "visible",
+              horizontal: "visible",
+              verticalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
+              horizontalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
+            },
 
+            mouseWheelZoom: true,
+            cursorSmoothCaretAnimation: true,
+            smoothScrolling: true,
+
+            selectOnLineNumbers: true,
+            lineNumbersMinChars: window.innerWidth <= 768 ? 3 : 5,
+          }}
+        />
+        <button className="run-btn" onClick={runCode}>
+          Execute
+        </button>
+        <textarea
+          className="output-console"
+          value={output}
+          readOnly
+          placeholder="Output will appear here..."
+        ></textarea>
       </div>
     </div>
   );
 };
 
 export default App;
-
-
-
