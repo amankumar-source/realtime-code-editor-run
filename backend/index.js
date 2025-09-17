@@ -8,7 +8,7 @@ const app = express();
 
 const server = http.createServer(app);
 
-const url = `http://localhost:5000`;
+const url = `https://realtime-code-editor-run.onrender.com`;
 const interval = 30000;
 
 function reloadWebsite() {
