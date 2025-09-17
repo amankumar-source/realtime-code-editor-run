@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import Editor from "@monaco-editor/react";
+import { v4 as uuid } from "uuid";
 
 const socket = io("https://realtime-code-editor-run.onrender.com");
 
@@ -36,6 +38,7 @@ const App = () => {
     socket.on("codeResponse", (response) => {
       setOutput(response.run.output);
     });
+
     return () => {
       socket.off("userJoined");
       socket.off("codeUpdate");
@@ -62,13 +65,14 @@ const App = () => {
       setJoined(true);
     }
   };
+
   const leaveRoom = () => {
     socket.emit("leaveRoom");
     setJoined(false);
     setRoomId("");
     setUserName("");
     setCode("// Start code here");
-    setLanguage("javascrpt");
+    setLanguage("javascript");
   };
 
   const copyRoomId = () => {
@@ -82,6 +86,7 @@ const App = () => {
     socket.emit("codeChange", { roomId, code: newCode });
     socket.emit("typing", { roomId, userName });
   };
+
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.value;
     setLanguage(newLanguage);
@@ -92,21 +97,43 @@ const App = () => {
     socket.emit("compileCode", { code, roomId, language, version });
   };
 
+  const createRoomId = () => {
+    const roomId = uuid();
+    setRoomId(roomId);
+  };
+
   if (!joined) {
     return (
       <div className="join-container">
+        <div className="app-header">
+          <svg
+            className="code-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="64"
+            height="64"
+          >
+            <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+          </svg>
+          <h1 className="app-title">Realtime Code Editor</h1>
+          <p className="app-description">
+            Collaborate in real time. Enter Room Id and Your Name to join or create a session.
+          </p>
+        </div>
+
         <div className="join-form">
-          <h1>Join code Room</h1>
           <input
             type="text"
             placeholder="Room Id"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
-
+          <button className="create-id-button" onClick={createRoomId}>
+            Create Id
+          </button>
           <input
             type="text"
-            placeholder="Your Name "
+            placeholder="Your Name"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
           />
@@ -115,6 +142,7 @@ const App = () => {
       </div>
     );
   }
+
   return (
     <div className="editor-container">
       <div className="sidebar">
@@ -123,15 +151,18 @@ const App = () => {
           <button onClick={copyRoomId} className="copy-button">
             Copy Id
           </button>
-          {copySuccess && <span className="copy-success">{copySuccess} </span>}
+          {copySuccess && <span className="copy-success">{copySuccess}</span>}
         </div>
+
         <h3>Users in Room</h3>
         <ul>
           {users.map((user, index) => (
             <li key={index}>{user.slice(0, 8)}...</li>
           ))}
         </ul>
+
         <p className="typing-indicator">{typing}</p>
+
         <select
           className="language-selector"
           value={language}
@@ -142,10 +173,12 @@ const App = () => {
           <option value="java">Java</option>
           <option value="cpp">C++</option>
         </select>
+
         <button className="leave-button" onClick={leaveRoom}>
           Leave Room
         </button>
       </div>
+
       <div className="editor-wrapper">
         <Editor
           height={"60%"}
@@ -169,11 +202,9 @@ const App = () => {
               verticalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
               horizontalScrollbarSize: window.innerWidth <= 768 ? 14 : 17,
             },
-
             mouseWheelZoom: true,
             cursorSmoothCaretAnimation: true,
             smoothScrolling: true,
-
             selectOnLineNumbers: true,
             lineNumbersMinChars: window.innerWidth <= 768 ? 3 : 5,
           }}
@@ -181,15 +212,25 @@ const App = () => {
         <button className="run-btn" onClick={runCode}>
           Execute
         </button>
+
         <textarea
           className="output-console"
           value={output}
           readOnly
           placeholder="Output will appear here..."
-        ></textarea>
+        />
       </div>
     </div>
   );
 };
 
 export default App;
+
+
+
+
+
+
+
+
+
