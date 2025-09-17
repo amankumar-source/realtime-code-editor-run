@@ -1,7 +1,7 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import path from "path"
+import path from "path";
 import axios from "axios";
 
 const app = express();
@@ -24,8 +24,6 @@ function reloadWebsite() {
 
 setInterval(reloadWebsite, interval);
 
-
-
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -43,8 +41,11 @@ io.on("connection", (socket) => {
   socket.on("join", ({ roomId, userName }) => {
     if (currentRoom) {
       socket.leave(currentRoom);
-      rooms.get(currentRoom).delete(currentUser);
-      io.to(currentRoom).emit("userJoined", Array.from(rooms.get(currentRoom)));
+      rooms.get(currentRoom).users.delete(currentUser);
+      io.to(currentRoom).emit(
+        "userJoined",
+        Array.from(rooms.get(currentRoom).users)
+      );
     }
 
     currentRoom = roomId;
@@ -52,22 +53,28 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
     if (!rooms.has(roomId)) {
-      rooms.set(roomId, new Set());
+      rooms.set(roomId,{users: new Set(),code:"// start code here"});
     }
 
-    rooms.get(roomId).add(userName);
-    io.to(roomId).emit("userJoined", Array.from(rooms.get(currentRoom)));
+    rooms.get(roomId).users.add(userName);
+    socket.emit("codeUpdate",rooms.get(roomId).code);
+
+    io.to(roomId).emit("userJoined", Array.from(rooms.get(currentRoom).users));
+
 
     socket.on("codeChange", ({ roomId, code }) => {
+      if(rooms.has(roomId)){
+        rooms.get(roomId).code = code
+      }
       socket.to(roomId).emit("codeUpdate", code);
     });
 
     socket.on("leaveRoom", () => {
       if (currentRoom && currentUser) {
-        rooms.get(currentRoom).delete(currentUser);
+        rooms.get(currentRoom).users.delete(currentUser);
         io.to(currentRoom).emit(
           "userJoined",
-          Array.from(rooms.get(currentRoom))
+          Array.from(rooms.get(currentRoom).users)
         );
         socket.leave(currentRoom);
 
@@ -82,27 +89,30 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("languageUpdate", language);
     });
 
-    // compiler execute  section 
-    socket.on("compileCode",async({code,roomId,language, version})=>{
-      if(rooms.has(roomId)){
-        const room = rooms.get(roomId)
-        const response= await axios.post("https://emkc.org/api/v2/piston/execute",{
-          language,
-          version,
-          files:[
-            {
-            content: code
-            }
-          ]
-        })
-        room.output = response.data.run.output
-        io.to(roomId).emit("codeResponse",response.data);
+    // compiler execute  section
+    socket.on("compileCode", async ({ code, roomId, language, version }) => {
+      if (rooms.has(roomId)) {
+        const room = rooms.get(roomId);
+        const response = await axios.post(
+          "https://emkc.org/api/v2/piston/execute",
+          {
+            language,
+            version,
+            files: [
+              {
+                content: code,
+              },
+            ],
+          }
+        );
+        room.output = response.data.run.output;
+        io.to(roomId).emit("codeResponse", response.data);
       }
-    })
+    });
 
     socket.on("disconnect", () => {
       if (currentRoom && currentUser) {
-        rooms.get(currentRoom).delete(currentUser);
+        rooms.get(currentRoom).users.delete(currentUser);
         io.to(currentRoom).emit(
           "userJoined",
           Array.from(rooms.get(currentRoom))
@@ -115,22 +125,14 @@ io.on("connection", (socket) => {
 
 const port = process.env.PORT || 5000;
 
-
 const __dirname = path.resolve();
 
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-app.use(express.static(path.join(__dirname,"/frontend/dist")));
-
-app.get("",(req,res)=>{
-  res.sendFile(path.join(__dirname,"frontend","dist","index.html"));
-})
-
-
+app.get("", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 server.listen(port, () => {
   console.log("server is running on port 5000");
 });
-
-
-
-
