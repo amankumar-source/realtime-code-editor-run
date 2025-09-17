@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import "./App.css";
 import io from "socket.io-client";
@@ -113,11 +112,15 @@ const App = () => {
             width="64"
             height="64"
           >
-            <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+            <path
+              fill="currentColor"
+              d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"
+            />
           </svg>
           <h1 className="app-title">Realtime Code Editor</h1>
           <p className="app-description">
-            Collaborate in real time. Enter Room Id and Your Name to join or create a session.
+            Collaborate in real time. Enter Room Id and Your Name to join or
+            create a session.
           </p>
         </div>
 
@@ -225,12 +228,3 @@ const App = () => {
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
