@@ -349,9 +349,24 @@ body {
 }
 
 .run-btn {
-  background-color: rgb(12, 209, 38);
-  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-left: 10px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+   
 }
+.run-btn:hover {
+  background-color: #666;
+}
+
+
+
+
+
 .output-console {
   width: 100%;
   margin-top: 10px;
@@ -453,3 +468,19 @@ body {
     height: 48px;
   }
 }
+
+.download-btn {
+  background-color: #444;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-left: 10px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.download-btn:hover {
+  background-color: #666;
+}
+
