@@ -5,17 +5,16 @@ import path from "path";
 import axios from "axios";
 
 const app = express();
-
 const server = http.createServer(app);
 
-const url = `http://localhost:5000`;
+const url = `https://realtime-code-editor-run.onrender.com`;
 const interval = 30000;
 
 function reloadWebsite() {
   axios
     .get(url)
     .then((response) => {
-      console.log("website reloded");
+      console.log("website reloaded");
     })
     .catch((error) => {
       console.error(`Error : ${error.message}`);
@@ -27,7 +26,12 @@ setInterval(reloadWebsite, interval);
 const io = new Server(server, {
   cors: {
     origin: "*",
+    methods: ["GET", "POST"],
   },
+  transports: ["websocket"], // << IMPORTANT FIX
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  maxHttpBufferSize: 1e6,
 });
 
 const rooms = new Map();
@@ -38,10 +42,53 @@ io.on("connection", (socket) => {
   let currentRoom = null;
   let currentUser = null;
 
+  // Connection events for debugging
+  socket.on("connect", () => {
+    console.log(`Socket ${socket.id} connected successfully`);
+  });
+
+  // socket.on("disconnect", (reason) => {
+  //   console.log(`Socket ${socket.id} disconnected:`, reason);
+  //   if (currentRoom && currentUser) {
+  //     rooms.get(currentRoom)?.users?.delete(currentUser);
+  //     if (rooms.has(currentRoom)) {
+  //       io.to(currentRoom).emit(
+  //         "userJoined",
+  //         Array.from(rooms.get(currentRoom).users)
+  //       );
+  //     }
+  //   }
+  // });
+
+
+  socket.on("disconnect", (reason) => {
+  console.log(`Socket ${socket.id} disconnected:`, reason);
+
+  if (!currentRoom || !currentUser) return;
+
+  const room = rooms.get(currentRoom);
+  if (!room) return;
+
+  room.users.delete(currentUser);
+ io.to(currentRoom).emit("toast", `${currentUser} disconnected`);
+  io.to(currentRoom).emit("userJoined", Array.from(room.users));
+ 
+
+  // ✅ FIX: delete room if empty
+  if (room.users.size === 0) {
+    rooms.delete(currentRoom);
+    console.log(`Room ${currentRoom} deleted (disconnect)`);
+  }
+
+  currentRoom = null;
+  currentUser = null;
+});
+
+
   socket.on("join", ({ roomId, userName }) => {
     if (currentRoom) {
       socket.leave(currentRoom);
-      rooms.get(currentRoom).users.delete(currentUser);
+      rooms.get(currentRoom)?.users?.delete(currentUser);
       io.to(currentRoom).emit(
         "userJoined",
         Array.from(rooms.get(currentRoom).users)
@@ -53,86 +100,112 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
     if (!rooms.has(roomId)) {
-      rooms.set(roomId,{users: new Set(),code:"// start code here"});
+      rooms.set(roomId, { users: new Set(), code: "// start code here" });
     }
 
     rooms.get(roomId).users.add(userName);
-    socket.emit("codeUpdate",rooms.get(roomId).code);
+    io.to(roomId).emit("toast", `${userName} joined the room`);
 
-    io.to(roomId).emit("userJoined", Array.from(rooms.get(currentRoom).users));
+    socket.emit("codeUpdate", rooms.get(roomId).code);
+    io.to(roomId).emit("userJoined", Array.from(rooms.get(roomId).users));
+  });
 
-
-    socket.on("codeChange", ({ roomId, code }) => {
-      if(rooms.has(roomId)){
-        rooms.get(roomId).code = code
-      }
+  socket.on("codeChange", ({ roomId, code }) => {
+    if (rooms.has(roomId)) {
+      rooms.get(roomId).code = code;
       socket.to(roomId).emit("codeUpdate", code);
-    });
+    }
+  });
 
-    socket.on("leaveRoom", () => {
-      if (currentRoom && currentUser) {
-        rooms.get(currentRoom).users.delete(currentUser);
-        io.to(currentRoom).emit(
-          "userJoined",
-          Array.from(rooms.get(currentRoom).users)
-        );
-        socket.leave(currentRoom);
+  // socket.on("leaveRoom", () => {
+  //   if (currentRoom && currentUser) {
+  //     rooms.get(currentRoom)?.users?.delete(currentUser);
+  //     io.to(currentRoom).emit(
+  //       "userJoined",
+  //       Array.from(rooms.get(currentRoom).users)
+  //     );
+  //     socket.leave(currentRoom);
+  //     currentRoom = null;
+  //     currentUser = null;
+  //   }
+  // });
 
-        currentRoom = null;
-        currentUser = null;
-      }
-    });
-    socket.on("typing", ({ roomId, userName }) => {
-      socket.to(roomId).emit("userTyping", userName);
-    });
-    socket.on("languageChange", ({ roomId, language }) => {
-      io.to(roomId).emit("languageUpdate", language);
-    });
 
-    // compiler execute  section
-    socket.on("compileCode", async ({ code, roomId, language, version }) => {
-      if (rooms.has(roomId)) {
-        const room = rooms.get(roomId);
+
+
+
+  socket.on("leaveRoom", () => {
+  if (!currentRoom || !currentUser) return;
+
+  const room = rooms.get(currentRoom);
+  if (!room) return;
+
+  // ✅ STEP 1: emit toast FIRST
+  io.to(currentRoom).emit("toast", `${currentUser} left the room`);
+
+  // remove user
+  room.users.delete(currentUser);
+
+  // update users list
+  io.to(currentRoom).emit("userJoined", Array.from(room.users));
+
+  socket.leave(currentRoom);
+
+  // delete room if empty
+  if (room.users.size === 0) {
+    rooms.delete(currentRoom);
+    console.log(`Room ${currentRoom} deleted`);
+  }
+
+  // ✅ STEP 2: clear AFTER emitting
+  currentRoom = null;
+  currentUser = null;
+});
+
+
+
+
+ 
+
+  socket.on("typing", ({ roomId, userName }) => {
+    socket.to(roomId).emit("userTyping", userName);
+  });
+
+  socket.on("languageChange", ({ roomId, language }) => {
+    io.to(roomId).emit("languageUpdate", language);
+  });
+
+  socket.on("compileCode", async ({ code, roomId, language, version }) => {
+    if (rooms.has(roomId)) {
+      try {
         const response = await axios.post(
           "https://emkc.org/api/v2/piston/execute",
           {
             language,
             version,
-            files: [
-              {
-                content: code,
-              },
-            ],
+            files: [{ content: code }],
           }
         );
-        room.output = response.data.run.output;
+        rooms.get(roomId).output = response.data.run.output;
         io.to(roomId).emit("codeResponse", response.data);
+      } catch (error) {
+        io.to(roomId).emit("codeResponse", { error: error.message });
       }
-    });
-
-    socket.on("disconnect", () => {
-      if (currentRoom && currentUser) {
-        rooms.get(currentRoom).users.delete(currentUser);
-        io.to(currentRoom).emit(
-          "userJoined",
-          Array.from(rooms.get(currentRoom))
-        );
-      }
-      console.log("user connected");
-    });
+    }
   });
 });
 
 const port = process.env.PORT || 5000;
-
 const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
-
 app.get("", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 server.listen(port, () => {
-  console.log("server is running on port 5000");
+  console.log(`server is running on port ${port}`);
 });
+
+
+
