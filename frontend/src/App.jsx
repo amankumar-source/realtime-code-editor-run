@@ -4,7 +4,8 @@ import io from "socket.io-client";
 import Editor from "@monaco-editor/react";
 import { v4 as uuid } from "uuid";
 
-const socket = io("http://localhost:5000", {
+// NEW CODE - Uses the production URL
+const socket = io("https://realtime-code-editor-run.onrender.com", {
   transports: ["websocket"],
   reconnection: true,
   reconnectionAttempts: Infinity,
@@ -19,16 +20,13 @@ const App = () => {
   const [code, setCode] = useState("// Start code here");
   const [copySuccess, setCopySuccess] = useState("");
   const [users, setUsers] = useState([]);
-  // const [typing, setTyping] = useState("");
   const [typingUser, setTypingUser] = useState(null);
-
   const [output, setOutput] = useState("");
   const [version] = useState("*");
   const [connectionStatus, setConnectionStatus] = useState("Connecting...");
   const [theme, setTheme] = useState("dark");
   const [toast, setToast] = useState("");
 
-  
 
 
   useEffect(() => {
