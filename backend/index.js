@@ -8,27 +8,17 @@ const app = express();
 const server = http.createServer(app);
 
 const url = `https://realtime-code-editor-run.onrender.com`;
-const interval = 30000;
 
-function reloadWebsite() {
-  axios
-    .get(url)
-    .then((response) => {
-      console.log("website reloaded");
-    })
-    .catch((error) => {
-      console.error(`Error : ${error.message}`);
-    });
-}
-
-setInterval(reloadWebsite, interval);
+setInterval(() => {
+  axios.get(url).catch(() => {});
+}, 30000);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: true,
     methods: ["GET", "POST"],
   },
-  transports: ["websocket"], // << IMPORTANT FIX
+  transports: ["websocket", "polling"],
   pingInterval: 25000,
   pingTimeout: 60000,
   maxHttpBufferSize: 1e6,
@@ -41,11 +31,6 @@ io.on("connection", (socket) => {
 
   let currentRoom = null;
   let currentUser = null;
-
-  // Connection events for debugging
-  socket.on("connect", () => {
-    console.log(`Socket ${socket.id} connected successfully`);
-  });
 
   // socket.on("disconnect", (reason) => {
   //   console.log(`Socket ${socket.id} disconnected:`, reason);
@@ -60,30 +45,27 @@ io.on("connection", (socket) => {
   //   }
   // });
 
-
   socket.on("disconnect", (reason) => {
-  console.log(`Socket ${socket.id} disconnected:`, reason);
+    console.log(`Socket ${socket.id} disconnected:`, reason);
 
-  if (!currentRoom || !currentUser) return;
+    if (!currentRoom || !currentUser) return;
 
-  const room = rooms.get(currentRoom);
-  if (!room) return;
+    const room = rooms.get(currentRoom);
+    if (!room) return;
 
-  room.users.delete(currentUser);
- io.to(currentRoom).emit("toast", `${currentUser} disconnected`);
-  io.to(currentRoom).emit("userJoined", Array.from(room.users));
- 
+    room.users.delete(currentUser);
+    io.to(currentRoom).emit("toast", `${currentUser} disconnected`);
+    io.to(currentRoom).emit("userJoined", Array.from(room.users));
 
-  // ✅ FIX: delete room if empty
-  if (room.users.size === 0) {
-    rooms.delete(currentRoom);
-    console.log(`Room ${currentRoom} deleted (disconnect)`);
-  }
+    // ✅ FIX: delete room if empty
+    if (room.users.size === 0) {
+      rooms.delete(currentRoom);
+      console.log(`Room ${currentRoom} deleted (disconnect)`);
+    }
 
-  currentRoom = null;
-  currentUser = null;
-});
-
+    currentRoom = null;
+    currentUser = null;
+  });
 
   socket.on("join", ({ roomId, userName }) => {
     if (currentRoom) {
@@ -130,42 +112,33 @@ io.on("connection", (socket) => {
   //   }
   // });
 
-
-
-
-
   socket.on("leaveRoom", () => {
-  if (!currentRoom || !currentUser) return;
+    if (!currentRoom || !currentUser) return;
 
-  const room = rooms.get(currentRoom);
-  if (!room) return;
+    const room = rooms.get(currentRoom);
+    if (!room) return;
 
-  // ✅ STEP 1: emit toast FIRST
-  io.to(currentRoom).emit("toast", `${currentUser} left the room`);
+    // ✅ STEP 1: emit toast FIRST
+    io.to(currentRoom).emit("toast", `${currentUser} left the room`);
 
-  // remove user
-  room.users.delete(currentUser);
+    // remove user
+    room.users.delete(currentUser);
 
-  // update users list
-  io.to(currentRoom).emit("userJoined", Array.from(room.users));
+    // update users list
+    io.to(currentRoom).emit("userJoined", Array.from(room.users));
 
-  socket.leave(currentRoom);
+    socket.leave(currentRoom);
 
-  // delete room if empty
-  if (room.users.size === 0) {
-    rooms.delete(currentRoom);
-    console.log(`Room ${currentRoom} deleted`);
-  }
+    // delete room if empty
+    if (room.users.size === 0) {
+      rooms.delete(currentRoom);
+      console.log(`Room ${currentRoom} deleted`);
+    }
 
-  // ✅ STEP 2: clear AFTER emitting
-  currentRoom = null;
-  currentUser = null;
-});
-
-
-
-
- 
+    // ✅ STEP 2: clear AFTER emitting
+    currentRoom = null;
+    currentUser = null;
+  });
 
   socket.on("typing", ({ roomId, userName }) => {
     socket.to(roomId).emit("userTyping", userName);
@@ -206,6 +179,3 @@ app.get("", (req, res) => {
 server.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
-
-
- 
