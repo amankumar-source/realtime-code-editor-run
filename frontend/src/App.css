@@ -5,7 +5,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", sans-serif;
   background: #0d1117;
   color: #e6edf3;
   overflow-x: hidden;
@@ -24,11 +25,15 @@ body {
 }
 
 .join-container::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(88, 166, 255, 0.15) 0%,
+    transparent 70%
+  );
   top: -200px;
   right: -200px;
   border-radius: 50%;
@@ -40,37 +45,20 @@ body {
   z-index: 1;
 }
 
-/* .logo-wrapper {
-  display: inline-flex;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
-  border-radius: 20px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(88, 166, 255, 0.3);
-}
-
-.code-icon {
-  width: 48px;
-  height: 48px;
-  color: white;
-} */
-
 .logo-wrapper {
   display: inline-flex;
-  padding: 0.9rem;              /* ⬅ reduced */
+  padding: 0.9rem;
   background: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
-  border-radius: 14px;          /* ⬅ smaller rounded square */
+  border-radius: 14px;
   margin-bottom: 1.2rem;
   box-shadow: 0 6px 20px rgba(88, 166, 255, 0.25);
-  
 }
 
 .code-icon {
-  width: 32px;                  /* ⬅ smaller icon */
+  width: 32px;
   height: 32px;
   color: white;
 }
-
 
 .app-title {
   font-size: 3rem;
@@ -118,7 +106,7 @@ body {
 
 .status-dot.disconnected,
 .status-dot.connection {
- background: #f85149;
+  background: #f85149;
   box-shadow: 0 0 10px rgba(248, 81, 73, 0.6);
 }
 
@@ -129,8 +117,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .join-form {
@@ -248,7 +241,7 @@ body {
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #e6edf3;
+  color: #58a6ff;
   margin-bottom: 0.75rem;
 }
 
@@ -292,67 +285,8 @@ body {
   padding: 1.5rem;
   border-bottom: 1px solid #30363d;
 }
-.room-id-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 /* Keep ID readable but flexible */
-.room-id-display {
-  flex: 1;
-  padding: 0.6rem 0.7rem;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  color: #58a6ff;
-  font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.8rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Small square copy icon */
-.copy-icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  border: 1px solid #30363d;
-  background: #21262d;
-  color: #e6edf3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.copy-icon-btn:hover {
-  background: #30363d;
-  border-color: #58a6ff;
-}
-
-.copy-icon-btn:active {
-  transform: scale(0.95);
-}
-
-@media (max-width: 480px) {
-  .copy-icon-btn {
-    width: 30px;
-    height: 30px;
-  }
-
-  .room-id-display {
-    font-size: 0.75rem;
-  }
-}
-
-
-
-
-
 
 .info-label {
   display: block;
@@ -364,44 +298,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-.room-id-display {
-  padding: 0.75rem;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  color: #58a6ff;
-  font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.875rem;
-  margin-bottom: 0.75rem;
-  word-break: break-all;
-}
 
-.copy-button {
-  width: 100%;
-  padding: 0.625rem 1rem;
-  background: #21262d;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  color: #e6edf3;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 36px;
-}
-
-.copy-button:hover {
-  background: #30363d;
-  border-color: #58a6ff;
-}
-
-.copy-button:active {
-  transform: scale(0.98);
-}
 
 .users-section {
   padding: 1.5rem;
@@ -459,16 +356,6 @@ body {
   flex-shrink: 0;
 }
 
-.user-name {
-  font-size: 0.875rem;
-  color: #e6edf3;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  
-}
-
 .typing-indicator {
   margin-top: 1rem;
   padding: 0.625rem;
@@ -482,8 +369,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .controls-section {
@@ -600,7 +493,7 @@ body {
 }
 
 .tab-name {
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   white-space: nowrap;
 }
 
@@ -718,7 +611,7 @@ body {
   background: #0d1117;
   border: none;
   color: #e6edf3;
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   font-size: 0.875rem;
   resize: vertical;
   min-height: 100px;
@@ -806,9 +699,10 @@ body {
   }
 
   .output-console {
-    height: 150px;
-    font-size: 0.75rem;
-    padding: 0.75rem;
+    height: 220px;
+    min-height: 200px;
+    font-size: 0.8rem;
+    padding: 0.9rem;
   }
 
   .editor-content {
@@ -854,11 +748,6 @@ body {
 
   .sidebar-title {
     font-size: 1.1rem;
-  }
-
-  .room-id-display {
-    font-size: 0.75rem;
-    padding: 0.625rem;
   }
 
   .user-avatar {
@@ -922,10 +811,6 @@ body {
 
   .sidebar-title {
     font-size: 1rem;
-  }
-
-  .room-id-display {
-    font-size: 0.75rem;
   }
 
   .section-title {
@@ -1014,30 +899,6 @@ body {
   }
 }
 
-
-
-:root[data-theme="dark"] {
-  --bg-main: #0d1117;
-  --bg-sidebar: #161b22;
-  --bg-input: #0d1117;
-  --text-main: #e6edf3;
-  --text-muted: #8b949e;
-  --border-color: #30363d;
-  --header-bg: #161b22;
-}
-
-:root[data-theme="light"] {
-  --bg-main: #ffffff;
-  --bg-sidebar: #f6f8fa; 
-  --bg-input: #ffffff;
-  --text-main: #1f2328; 
-  --text-muted: #57606a;
-  --border-color: #d0d7de;
-  --header-bg: #f6f8fa;
-}
-
-
-
 /* --- THEME DEFINITIONS --- */
 :root[data-theme="dark"] {
   --bg-main: #0d1117;
@@ -1052,7 +913,7 @@ body {
 
 :root[data-theme="light"] {
   --bg-main: #ffffff;
-  --bg-sidebar: #f6f8fa; 
+  --bg-sidebar: #f6f8fa;
   --bg-input: #ffffff;
   --text-main: #1f2328;
   --text-muted: #57606a;
@@ -1068,17 +929,31 @@ body {
 }
 
 /* Sidebar and Header visibility */
-.sidebar { background-color: var(--bg-sidebar); border-color: var(--border-color); }
-.editor-header, .output-header { background-color: var(--header-bg); border-color: var(--border-color); }
+.sidebar {
+  background-color: var(--bg-sidebar);
+  border-color: var(--border-color);
+}
+.editor-header,
+.output-header {
+  background-color: var(--header-bg);
+  border-color: var(--border-color);
+}
 
 /* Fix the "main.js" tab and Labels */
-.tab-name, .sidebar-title, .info-label, .section-title, .user-name {
+.tab-name,
+.sidebar-title,
+.info-label,
+.section-title,
+.user-name {
   color: var(--text-main) !important;
   font-weight: 600;
 }
 
 /* Make inputs and items stand out */
-.room-id-display, .user-item, .language-selector, .output-console {
+.room-id-display,
+.user-item,
+.language-selector,
+.output-console {
   background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-main) !important;
@@ -1089,12 +964,14 @@ body {
   background-color: var(--tab-active);
   border: 1px solid var(--border-color);
   border-bottom-color: transparent;
-  border-top: 2px solid grey; /* Blue accent line */
+  border-top: 2px solid grey;
   z-index: 2;
 }
 
 /* Buttons: Keep them looking like your screenshot but visible */
-.action-btn.download-btn, .theme-toggle-btn, .copy-button {
+.action-btn.download-btn,
+.theme-toggle-btn,
+.copy-button {
   background-color: var(--bg-sidebar);
   color: var(--text-main);
   border: 1px solid var(--border-color);
@@ -1103,11 +980,6 @@ body {
 .action-btn.download-btn:hover {
   background-color: var(--border-color);
 }
-
-
-
-
-
 
 @media screen and (max-width: 768px) {
   .logo-wrapper {
@@ -1133,22 +1005,20 @@ body {
   }
 }
 
-
-
 .toast {
   position: fixed;
-  top: 20px;                 /* ⬆ move to top */
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(22, 27, 34, 0.95);
   color: #e6edf3;
   padding: 0.8rem 1.4rem;
   border-radius: 8px;
-  font-size: 0.9rem;         /* ⬆ clear front size */
+  font-size: 0.9rem;
   font-weight: 600;
   border: 1px solid #30363d;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
-  z-index: 9999;             /* ⬆ always on top */
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  z-index: 9999;
   animation: slideDown 0.3s ease;
 }
 
@@ -1163,7 +1033,6 @@ body {
   }
 }
 
-
 @media screen and (max-width: 480px) {
   .toast {
     top: 12px;
@@ -1175,24 +1044,6 @@ body {
 }
 
 
-
-
-/* --- Typing dots (bigger & animated) --- */
-.typing-dots {
-  font-size: 1.9rem;        
-  font-weight: 900;
-  margin-left: 6px;
-  color: #58a6ff;
-  letter-spacing: 3px;
-  animation: dotsPulse 1.2s infinite ease-in-out;
-}
-
-@keyframes dotsPulse {
-  0% { opacity: 0.3; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.25); }
-  100% { opacity: 0.3; transform: scale(0.9); }
-}
-
 /* mobile safety */
 @media (max-width: 480px) {
   .typing-dots {
@@ -1200,19 +1051,8 @@ body {
   }
 }
 
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-}
-
 .user-name {
-  flex: 1;                     
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1220,21 +1060,6 @@ body {
   font-weight: 500;
   color: #e6edf3;
 }
-
-
-.typing-dots {
-  font-size: 2.1rem;            
-  font-weight: 900;
-  color: #79c0ff;              
-  letter-spacing: 4px;
-  margin-left: 10px;
-  animation: dotsPulse 1.2s infinite ease-in-out;
-  filter: drop-shadow(0 0 6px rgba(121, 192, 255, 0.6));
-}
-
-.typing-wave{
-  color: green;
-} 
 
 
 
@@ -1259,25 +1084,28 @@ body {
   white-space: nowrap;
 }
 
-
 .typing-dots {
   font-size: 1.4rem;
   font-weight: 800;
   color: #58a6ff;
   letter-spacing: 3px;
-  margin-left: auto;              /* ⬅ pushes to right end */
+  margin-left: auto;
   animation: typingBlink 1.2s infinite ease-in-out;
   filter: drop-shadow(0 0 6px rgba(88, 166, 255, 0.6));
 }
 
 /* Smooth professional blink */
 @keyframes typingBlink {
-  0%   { opacity: 0.2; }
-  20%  { opacity: 1; }
-  100% { opacity: 0.2; }
+  0% {
+    opacity: 0.2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
 }
-
-
 
 .room-id-box {
   display: flex;
@@ -1293,7 +1121,7 @@ body {
 .room-id-text {
   flex: 1;
   color: #58a6ff;
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   font-size: 0.8rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1324,7 +1152,6 @@ body {
   transform: scale(0.95);
 }
 
-
 @media (max-width: 480px) {
   .room-id-text {
     font-size: 0.75rem;
@@ -1336,25 +1163,15 @@ body {
   }
 }
 
-
 .copy-inside-btn svg {
   transition: all 0.2s ease;
 }
 
 .copy-inside-btn:has(svg polyline) {
-  background: #238636;   /* GitHub green */
+  background: #238636;
   color: white;
 }
 
-
-
-
-/* 
-new code */
-
-
-
-/* MOBILE ONLY: show users immediately */
 @media (max-width: 768px) {
   .sidebar {
     display: flex;
@@ -1362,7 +1179,7 @@ new code */
   }
 
   .users-section {
-    order: 2;              /* 👈 bring users UP */
+    order: 2;
     padding-top: 0.5rem;
   }
 
@@ -1375,19 +1192,15 @@ new code */
   }
 }
 
-
-
 @media (max-width: 768px) {
   .controls-section {
     padding-top: 0.5rem;
   }
 
   .language-selector {
-    display: none;   /* 👈 hide language dropdown */
+    display: none;
   }
 }
-
-
 
 @media (max-width: 768px) {
   .sidebar-header {
@@ -1399,8 +1212,198 @@ new code */
   }
 }
 
+@media screen and (max-width: 768px) {
+  /* ---------- ROOM ID (TEXT REMOVED, COMPACT) ---------- */
+  .room-info label,
+  .info-label {
+    display: none !important;
+  }
 
+  .room-id-box {
+    padding: 0.35rem 0.45rem;
+    gap: 0.35rem;
+    max-width: fit-content;
+  }
 
+  .room-id-text {
+    font-size: 0.65rem;
+    max-width: 100px;
+  }
 
+  .copy-inside-btn {
+    width: 22px;
+    height: 22px;
+  }
 
+  .copy-inside-btn svg {
+    width: 11px;
+    height: 11px;
+  }
 
+  /* ---------- USERS HORIZONTAL (2 PER ROW) ---------- */
+  .users-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .user-item {
+    padding: 0.35rem 0.45rem;
+    gap: 0.4rem;
+  }
+
+  .user-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+
+  .user-name {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  /* ---------- LANGUAGE SELECTOR SHOW AGAIN ---------- */
+  .language-selector {
+    display: block !important;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+    min-height: 32px;
+  }
+}
+
+/* EXTRA SMALL PHONES */
+@media screen and (max-width: 480px) {
+  .room-id-text {
+    max-width: 80px;
+    font-size: 0.6rem;
+  }
+
+  .user-name {
+    font-size: 0.7rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  .control-label {
+    display: none !important;
+  }
+}
+
+/* HIDE main.js TAB COMPLETELY ON MOBILE */
+@media screen and (max-width: 768px) {
+  /* remove tab bar */
+  .editor-tabs {
+    display: none !important;
+  }
+
+  /* tighten editor header since tabs gone */
+  .editor-header {
+    min-height: auto;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Remove connected indicator completely */
+  .connection-indicator {
+    display: none !important;
+  }
+
+  /* Header layout cleanup */
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+  }
+
+  /* Room ID inline box in header */
+  .sidebar-header .room-id-box {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.45rem;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    max-width: 130px;
+  }
+
+  .sidebar-header .room-id-text {
+    font-size: 0.65rem;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-header .copy-inside-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sidebar-header .copy-inside-btn svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .room-info {
+    display: block !important;
+  }
+
+  .room-id-box {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.45rem;
+
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+  }
+
+  .room-id-text {
+    font-size: 0.65rem;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .copy-inside-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .room-info {
+    padding: 0 !important;
+    border: none !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .user-item {
+    min-height: 40px;
+    align-items: center;
+  }
+
+  .typing-dots {
+    width: 20px;
+    min-width: 20px;
+    text-align: center;
+
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-left: auto;
+
+    animation: typingBlink 1.2s infinite ease-in-out;
+  }
+}
