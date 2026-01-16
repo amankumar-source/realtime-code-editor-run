@@ -1349,6 +1349,58 @@ body {
 
 
 
+/* 
+new code */
+
+
+
+/* MOBILE ONLY: show users immediately */
+@media (max-width: 768px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .users-section {
+    order: 2;              /* 👈 bring users UP */
+    padding-top: 0.5rem;
+  }
+
+  .room-info {
+    order: 1;
+  }
+
+  .controls-section {
+    order: 3;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .controls-section {
+    padding-top: 0.5rem;
+  }
+
+  .language-selector {
+    display: none;   /* 👈 hide language dropdown */
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .sidebar-header {
+    padding-bottom: 0.4rem;
+  }
+
+  .room-info {
+    padding-bottom: 0.5rem;
+  }
+}
+
+
+
 
 
 
