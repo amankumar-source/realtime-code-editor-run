@@ -18,11 +18,11 @@ const App = () => {
   const [userName, setUserName] = useState("");
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("// Start code here");
-  const [copySuccess, setCopySuccess] = useState("");
+  const [copySuccess, setCopySuccess] = useState(false);
   const [users, setUsers] = useState([]);
   const [typingUser, setTypingUser] = useState(null);
   const [output, setOutput] = useState("");
-  const [version] = useState("*");
+  const version = "*";
   const [connectionStatus, setConnectionStatus] = useState("Connecting...");
   const [theme, setTheme] = useState("dark");
   const [toast, setToast] = useState("");
@@ -118,11 +118,18 @@ const App = () => {
     setLanguage("javascript");
   }, []);
 
+  // const copyRoomId = useCallback(() => {
+  //   navigator.clipboard.writeText(roomId);
+  //   setCopySuccess("Copied!");
+  //   setTimeout(() => setCopySuccess(""), 2000);
+  // }, [roomId]);
+
   const copyRoomId = useCallback(() => {
-    navigator.clipboard.writeText(roomId);
-    setCopySuccess("Copied!");
-    setTimeout(() => setCopySuccess(""), 2000);
-  }, [roomId]);
+  navigator.clipboard.writeText(roomId);
+  setCopySuccess(true);
+  setTimeout(() => setCopySuccess(false), 1500);
+}, [roomId]);
+
 
   const handleCodeChange = useCallback((newCode) => {
     setCode(newCode);
@@ -230,14 +237,46 @@ const toggleTheme = useCallback(() => {
         </div>
         <div className="room-info">
           <label className="info-label">Room ID</label>
-          <div className="room-id-display">{roomId.slice(0, 16)}...</div>
-          <button onClick={copyRoomId} className="copy-button">
+          {/* <div className="room-id-display">{roomId.slice(0, 16)}...</div> */}
+
+
+
+          {/* <button onClick={copyRoomId} className="copy-button">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
             {copySuccess || "Copy ID"}
-          </button>
+          </button> */}
+
+
+          <div className="room-id-box">
+  <span className="room-id-text">
+    {roomId.slice(0, 16)}...
+  </span>
+
+ <button
+  className="copy-inside-btn"
+  onClick={copyRoomId}
+  title="Copy Room ID"
+>
+  {copySuccess ? (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ) : (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  )}
+</button>
+
+</div>
+
+
+
+
         </div>
         <div className="users-section">
           <h3 className="section-title">
@@ -251,18 +290,36 @@ const toggleTheme = useCallback(() => {
           </h3>
           <ul className="users-list">
             {users.map((user, index) => (
-              <li key={index} className="user-item">
-                <div className={`user-avatar ${typingUser === user ? "typing" : ""}`}>
-  {user.charAt(0).toUpperCase()}
-  {typingUser === user && <span className="typing-dots">•••</span>}
-</div>
+//               <li key={index} className="user-item">
+//                 <div className={`user-avatar ${typingUser === user ? "typing" : ""}`}>
+//   {user.charAt(0).toUpperCase()}
+//   {typingUser === user && <span className="typing-dots">•••</span>}
+// </div>
 
-                <span className="user-name">
-  {user.slice(0, 12)}
-  {typingUser === user && <span className="typing-wave">~~~</span>}
-</span>
+//                 <span className="user-name">
+//   {user.slice(0, 12)}
+//   {typingUser === user && <span className="typing-wave">~~~</span>}
+// </span>
 
-              </li>
+//               </li>
+
+
+
+
+<li key={index} className="user-item">
+  <div className="user-avatar">
+    {user.charAt(0).toUpperCase()}
+  </div>
+
+  <span className="user-name">
+    {user.slice(0, 12)}
+  </span>
+
+  {typingUser === user && (
+    <span className="typing-dots">•••</span>
+  )}
+</li>
+
             ))}
           </ul>
           
@@ -366,9 +423,9 @@ const toggleTheme = useCallback(() => {
               <polyline points="4 17 10 11 4 5"></polyline>
               <line x1="12" y1="19" x2="20" y2="19"></line>
             </svg>
-            <span>Output Console</span>
+            <span>Output</span>
           </div>
-          <textarea className="output-console" value={output} readOnly placeholder="Code output will appear here..." />
+          <textarea className="output-console" value={output} readOnly placeholder="output will appear here..." />
         </div>
       </div>
       {toast && <div className="toast">{toast}</div>}
