@@ -92,6 +92,8 @@ body {
   height: 8px;
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
+  /* Promote to own compositor layer — avoids main-thread repaints per frame */
+  will-change: opacity;
 }
 
 .status-dot.connected {
@@ -231,6 +233,8 @@ body {
   flex-direction: column;
   overflow-y: auto;
   flex-shrink: 0;
+  /* Limits reflow caused by sidebar content changes to this subtree only */
+  contain: layout;
 }
 
 .sidebar-header {
@@ -250,10 +254,8 @@ body {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  /* background: rgba(13, 17, 23, 0.6); */
   background: var(--bg-input);
   border-radius: 6px;
-  /* border: 1px solid #30363d; */
   border: 1px solid var(--border-color);
 }
 
@@ -262,6 +264,7 @@ body {
   height: 6px;
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
+  will-change: opacity;
 }
 
 .connection-dot.connected {
@@ -280,7 +283,6 @@ body {
 .connection-text {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #8b949e;
   color: var(--text-muted);
 }
 
@@ -515,7 +517,8 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Shorten transition from 0.3s to 0.2s — snappier feel, less jank */
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
   min-height: 36px;
   white-space: nowrap;
 }
@@ -531,12 +534,12 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, transform 0.3s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
+  will-change: transform;
 }
 
 .theme-toggle-btn:hover {
-  /* background: #30363d; */
   background: var(--bg-sidebar);
   border-color: #58a6ff;
   transform: rotate(180deg);
@@ -545,10 +548,6 @@ body {
 
 .theme-toggle-btn:active {
   transform: rotate(180deg) scale(0.95);
-}
-
-.theme-toggle-btn svg {
-  transition: transform 0.3s ease;
 }
 
 .download-btn {
@@ -1022,6 +1021,11 @@ body {
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   z-index: 9999;
   animation: slideDown 0.3s ease;
+  /* GPU-composite the toast slide — keeps it off the main thread */
+  will-change: transform, opacity;
+  /* Prevent text from being selectable — avoids accidental selection on tap */
+  user-select: none;
+  pointer-events: none;
 }
 
 @keyframes slideDown {
@@ -1052,16 +1056,7 @@ body {
   }
 }
 
-.user-name {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #e6edf3;
-}
-
+/* Single canonical .user-item and .user-name declaration (removed duplicate) */
 .user-item {
   display: flex;
   align-items: center;
@@ -1072,7 +1067,6 @@ body {
   border-radius: 6px;
 }
 
-/* Name takes available space */
 .user-name {
   flex: 1;
   font-size: 0.875rem;
@@ -1091,6 +1085,7 @@ body {
   margin-left: auto;
   animation: typingBlink 1.2s infinite ease-in-out;
   filter: drop-shadow(0 0 6px rgba(88, 166, 255, 0.6));
+  will-change: opacity;
 }
 
 /* Smooth professional blink */
@@ -1107,13 +1102,6 @@ body {
 }
 
 .room-id-box {
-  /* display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 0.7rem;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 6px; */
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -1139,23 +1127,19 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 4px;
-  border: none;
-  /* background: #21262d; */
   background: var(--bg-sidebar);
-  /* color: #e6edf3; */
   color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
   border: 1px solid var(--border-color);
 }
 
 .copy-inside-btn:hover {
-  /* background: #30363d; */
-  background: var(--bg-sidebar);
+  background: var(--border-color);
   color: var(--text-main);
 }
 
@@ -1335,9 +1319,7 @@ body {
     align-items: center;
     gap: 0.35rem;
     padding: 0.3rem 0.45rem;
-    /* background: #0d1117; */
     background: var(--bg-input);
-    /* border: 1px solid #30363d; */
     border: 1px solid var(--border-color);
     border-radius: 6px;
     max-width: 130px;
@@ -1365,6 +1347,8 @@ body {
 @media screen and (max-width: 768px) {
   .room-info {
     display: block !important;
+    padding: 0 !important;
+    border: none !important;
   }
 
   .room-id-box {
@@ -1372,12 +1356,10 @@ body {
     top: 12px;
     right: 12px;
     z-index: 9999;
-
     display: flex;
     align-items: center;
     gap: 0.3rem;
     padding: 0.25rem 0.45rem;
-
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -1394,11 +1376,6 @@ body {
   .copy-inside-btn {
     width: 20px;
     height: 20px;
-  }
-
-  .room-info {
-    padding: 0 !important;
-    border: none !important;
   }
 }
 
