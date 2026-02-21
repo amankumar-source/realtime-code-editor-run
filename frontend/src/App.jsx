@@ -5,7 +5,11 @@ import Editor from "@monaco-editor/react";
 import { v4 as uuid } from "uuid";
 
 // Socket instantiated once at module level — persists across re-renders
-const socket = io("https://realtime-code-editor-run.onrender.com", {
+const SOCKET_URL = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "https://realtime-code-editor-run.onrender.com";
+
+const socket = io(SOCKET_URL, {
   transports: ["websocket"],
   reconnection: true,
   reconnectionAttempts: Infinity,

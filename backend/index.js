@@ -143,7 +143,15 @@ io.on("connection", (socket) => {
   });
 
   // ── compileCode ───────────────────────────────────────────────────────────
-  socket.on("compileCode", async ({ code, roomId, language, version }) => {
+  // Language → Wandbox compiler mapping
+  const WANDBOX_COMPILERS = {
+    javascript: "nodejs-20.17.0",
+    python: "cpython-3.12.7",
+    java: "openjdk-jdk-22+36",
+    cpp: "gcc-13.2.0",
+  };
+
+  socket.on("compileCode", async ({ code, roomId, language }) => {
     if (!rooms.has(roomId)) return;
 
     // Rate limit: reject if socket has compiled within the cooldown window
@@ -157,20 +165,44 @@ io.on("connection", (socket) => {
     }
     lastCompileTime.set(socket.id, now);
 
+    const compiler = WANDBOX_COMPILERS[language];
+    if (!compiler) {
+      io.to(roomId).emit("codeResponse", {
+        run: { output: `Error: Unsupported language "${language}"` },
+      });
+      return;
+    }
+
     try {
       const response = await axios.post(
-        "https://emkc.org/api/v2/piston/execute",
+        "https://wandbox.org/api/compile.json",
         {
-          language,
-          version,
-          files: [{ content: code }],
+          code,
+          compiler,
         },
         {
-          timeout: 15000, // 15s timeout — Piston occasionally hangs; prevents zombie requests
+          timeout: 30000, // 30s timeout — Java/C++ compilation can be slow
         }
       );
-      rooms.get(roomId).output = response.data.run.output;
-      io.to(roomId).emit("codeResponse", response.data);
+
+      const data = response.data;
+      // Wandbox returns program_output/program_error/compiler_error
+      let output = "";
+      if (data.compiler_error) {
+        output += data.compiler_error;
+      }
+      if (data.program_output) {
+        output += data.program_output;
+      }
+      if (data.program_error) {
+        output += (output ? "\n" : "") + data.program_error;
+      }
+      if (!output) {
+        output = data.status === "0" ? "(No output)" : "Compilation/runtime error";
+      }
+
+      rooms.get(roomId).output = output;
+      io.to(roomId).emit("codeResponse", { run: { output } });
     } catch (error) {
       io.to(roomId).emit("codeResponse", {
         run: { output: `Error: ${error.message}` },
@@ -205,7 +237,7 @@ app.use(
 
 // SPA fallback — serve index.html for all non-asset routes
 // Cache for 1 minute so new deploys propagate quickly
-app.get("*", (req, res) => {
+app.get("/{*splat}", (req, res) => {
   res.set("Cache-Control", "public, max-age=60");
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
