@@ -10,7 +10,7 @@ const SOCKET_URL = import.meta.env.DEV
   : "https://realtime-code-editor-run.onrender.com";
 
 const socket = io(SOCKET_URL, {
-  transports: ["websocket"],
+  transports: ["websocket", "polling"],
   reconnection: true,
   reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,

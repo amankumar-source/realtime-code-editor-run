@@ -174,16 +174,29 @@ io.on("connection", (socket) => {
     }
 
     try {
-      const response = await axios.post(
-        "https://wandbox.org/api/compile.json",
-        {
-          code,
-          compiler,
-        },
-        {
-          timeout: 30000, // 30s timeout — Java/C++ compilation can be slow
+      let response;
+      let retries = 2;
+      while (retries >= 0) {
+        try {
+          response = await axios.post(
+            "https://wandbox.org/api/compile.json",
+            {
+              code,
+              compiler,
+            },
+            {
+              timeout: 30000, // 30s timeout — Java/C++ compilation can be slow
+            }
+          );
+          break; // success
+        } catch (err) {
+          if (retries === 0 || (err.code !== 'ECONNRESET' && err.code !== 'ETIMEDOUT')) {
+            throw err;
+          }
+          retries--;
+          await new Promise(res => setTimeout(res, 1000));
         }
-      );
+      }
 
       const data = response.data;
       // Wandbox returns program_output/program_error/compiler_error
@@ -204,6 +217,9 @@ io.on("connection", (socket) => {
       rooms.get(roomId).output = output;
       io.to(roomId).emit("codeResponse", { run: { output } });
     } catch (error) {
+      // Clear rate limit so user can immediately try again after a hard network failure
+      lastCompileTime.delete(socket.id);
+
       io.to(roomId).emit("codeResponse", {
         run: { output: `Error: ${error.message}` },
       });
